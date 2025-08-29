@@ -15,7 +15,6 @@ type BinanceTrade = {
 };
 
 export async function saveTradedata(data: BinanceTrade) {
-    console.log("💾 Saving trade data:", data);
 
     // Validate data
     if ([data.T, data.s, data.p, data.q, data.t, data.E].some(v => v == null)) {
@@ -33,7 +32,6 @@ export async function saveTradedata(data: BinanceTrade) {
     }
 
     try {
-        console.log(`Inserting trade into md_trades (ts: ${ts.toISOString()}, symbol: ${data.s})`);
 
         await pool.query(
             `INSERT INTO md_trades
@@ -53,8 +51,6 @@ export async function saveTradedata(data: BinanceTrade) {
                 "binance",
             ]
         );
-
-        console.log("✅ Trade data saved successfully");
 
     } catch (err: any) {
         // Log detailed error info

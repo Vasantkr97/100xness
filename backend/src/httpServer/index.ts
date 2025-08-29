@@ -4,12 +4,12 @@ import cors from "cors";
 import candlesRoutes from "./routes/candles.route"
 
 dotenv.config();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
 app.use(cors({
-    origin: "https://localhost:5173",
+    origin: ["http://localhost:5173", "https://localhost:5173"],
     credentials: true,
 }))
 

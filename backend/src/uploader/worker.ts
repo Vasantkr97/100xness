@@ -53,9 +53,13 @@ export const tradeWorker = new Worker(
 );
 
 tradeWorker.on("completed", (job) => {
-    console.log(`Job ${job.id} completed`);
+    console.log(`✅ Job ${job.id} completed successfully`);
 });
 
 tradeWorker.on("failed", (job, err) => {
-    console.error(`Job ${job?.id} failed:`, err);
+    console.error(`❌ Job ${job?.id} failed:`, err);
+});
+
+tradeWorker.on("error", (err) => {
+    console.error("❌ Worker error:", err);
 });

@@ -1,8 +1,6 @@
 import { WebSocket } from "ws";
 
 import { createClient } from "redis";
-import { stringify } from "node:querystring";
-import { schema } from "./db/schema";
 import { tradeQueue } from "./uploader/queue";
 
 //call schema.ts once app getting started

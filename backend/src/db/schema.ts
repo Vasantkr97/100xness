@@ -65,6 +65,25 @@ export async function schema() {
 
         
         await client.query(`
+            --DO IT FOR 1min
+
+            CREATE MATERIALIZED VIEW IF NOT EXISTS md_candles_1m 
+            WITH (timescaledb.continuous) AS 
+            SELECT 
+                time_bucket(INTERVAL '1 minutes', ts) AS bucket, symbol,
+                first(price, ts)    AS open,
+                max(price)          AS high,
+                min(price)          AS low,
+                last(price, ts)     AS close,
+                sum(qty)            AS volume
+            FROM md_trades
+            GROUP BY bucket, symbol
+            WITH NO DATA;
+
+            CREATE INDEX IF NOT EXISTS idx_md_candles_1m_symbol_bucket
+                ON md_candles_1m(symbol, bucket DESC);
+
+
             --DO IT FOR 5min
 
             CREATE MATERIALIZED VIEW IF NOT EXISTS md_candles_5m 
@@ -82,6 +101,25 @@ export async function schema() {
 
             CREATE INDEX IF NOT EXISTS idx_md_candles_5m_symbol_bucket
                 ON md_candles_5m(symbol, bucket DESC);
+            
+
+            --DO IT FOR 10min
+
+            CREATE MATERIALIZED VIEW IF NOT EXISTS md_candles_10m 
+            WITH (timescaledb.continuous) AS 
+            SELECT 
+                time_bucket(INTERVAL '10 minutes', ts) AS bucket, symbol,
+                first(price, ts)    AS open,
+                max(price)          AS high,
+                min(price)          AS low,
+                last(price, ts)     AS close,
+                sum(qty)            AS volume
+            FROM md_trades
+            GROUP BY bucket, symbol
+            WITH NO DATA;
+
+            CREATE INDEX IF NOT EXISTS idx_md_candles_10m_symbol_bucket
+                ON md_candles_10m(symbol, bucket DESC);
 
 
             --DO IT FOR 30min
@@ -137,11 +175,30 @@ export async function schema() {
             WITH NO DATA;
 
             CREATE INDEX IF NOT EXISTS idx_md_candles_1d_symbol_bucket
-                ON md_candles_1d(symbol,  bucket DESC)
+                ON md_candles_1d(symbol, bucket DESC);
         `);
 
         // checking refresh policy for each
         await client.query(`
+            -- 1-minute refresh policy for md_candles_1m
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM timescaledb_information.jobs j
+                    WHERE j.proc_name = 'policy_refresh_continuous_aggregate'
+                    AND j.hypertable_name = 'md_candles_1m'
+                ) THEN
+                    PERFORM add_continuous_aggregate_policy(
+                        'md_candles_1m',
+                        start_offset => INTERVAL '1 hour',        -- how far back to refresh
+                        end_offset   => INTERVAL '1 minute',      -- stop 1 minute before now
+                        schedule_interval => INTERVAL '1 minute'  -- refresh every 1 minute
+                    );
+                END IF;
+            END$$;
+
+
             DO $$
             BEGIN 
                 PERFORM 1
@@ -158,6 +215,22 @@ export async function schema() {
                 END IF;
             END$$;
 
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM timescaledb_information.jobs j
+                    WHERE j.proc_name = 'policy_refresh_continuous_aggregate'
+                    AND j.hypertable_name = 'md_candles_10m'
+                ) THEN
+                    PERFORM add_continuous_aggregate_policy(
+                        'md_candles_10m',
+                        start_offset => INTERVAL '7 days',        -- refresh last 7 days
+                        end_offset   => INTERVAL '5 minutes',     -- stop 5 minutes before now
+                        schedule_interval => INTERVAL '10 minutes' -- refresh every 10 minutes
+                    );
+                END IF;
+            END$$;
 
             DO $$
             BEGIN 

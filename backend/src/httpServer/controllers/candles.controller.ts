@@ -12,16 +12,18 @@ interface Candle {
 
 
 export async function getCandles(req: any, res: any) {
-    console.log("request reaching from postman")
+    console.log("request reaching from client")
     try {
-        const { symbol, interval = "5m", limit="100" }= req.body;
+        const { symbol, interval = "1m", limit = "100" } = req.query;
 
         if (!symbol) {
             return res.status(400).json({ error: "Symbol is required"});
         }
 
         const tableMap: Record<string, string> = {
+            "1m": "md_candles_1m",
             "5m" : 'md_candles_5m',
+            "10m": "md_candles_10m",
             "30m": "md_candles_30m",
             "1h": "md_candles_1h",
             "1d": "md_candles_1d",
