@@ -4,16 +4,21 @@
   "main": "index.js",
   "scripts": {
     "start:ws": "ts-node src/wsPuller.ts",
-    "start:worker": "ts-node src/worker.ts",
-    "migrate:schema": "ts-node src/db/schema.ts"
+    "start:worker": "ts-node src/uploader/worker.ts",
+    "migrate:schema": "ts-node src/db/schema.ts",
+    "httpServer": "ts-node src/httpServer/index.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.14.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
     "bullmq": "^5.58.2",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
+    "express": "^5.1.0",
     "ioredis": "^5.7.0",
     "pg": "^8.16.3",
     "pg-pool": "^3.10.1",

@@ -28,7 +28,7 @@ export async function saveTradedata(data: BinanceTrade) {
 
     // Check if timestamp is valid
     if (isNaN(ts.getTime()) || isNaN(event_ts.getTime())) {
-        console.warn("⚠️ Invalid timestamps, skipping trade:", data);
+        console.warn("Invalid timestamps, skipping trade:", data);
         return;
     }
 
