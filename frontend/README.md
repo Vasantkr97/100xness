@@ -1,69 +1,79 @@
-# React + TypeScript + Vite
+# Frontend Trading Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a React-based trading application with real-time market data and candlestick charts.
 
-Currently, two official plugins are available:
+## Project Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ChartContainer.tsx
+│   ├── ChartHeader.tsx
+│   ├── RealTimePrices.tsx
+│   ├── TimeIntervalSelector.tsx
+│   └── index.ts
+├── hooks/              # Custom React hooks
+│   ├── useCandlestickData.ts
+│   ├── useWebSocket.ts
+│   └── index.ts
+├── pages/              # Page components
+│   └── TradingPage.tsx
+├── types/              # TypeScript type definitions
+│   └── index.ts
+├── utils/              # Utility functions
+│   └── formatters.ts
+├── styles/             # CSS styles
+│   └── animations.css
+├── App.tsx             # Main application component
+└── SimpleChart.tsx     # Chart component
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Components
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### `RealTimePrices`
+Displays live market prices in a table format with real-time updates.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### `ChartContainer`
+Container component that combines chart header, time interval selector, and the chart itself.
+
+### `ChartHeader`
+Header component with symbol selector and connection status indicator.
+
+### `TimeIntervalSelector`
+Component for selecting different time intervals (1m, 5m, 10m, 30m, 1h, 1d).
+
+## Hooks
+
+### `useWebSocket`
+Manages WebSocket connection for real-time trade data and price updates.
+
+### `useCandlestickData`
+Handles fetching and managing candlestick data for charts.
+
+## Types
+
+- `TradeData`: Interface for trade data from WebSocket
+- `CurrentPriceData`: Interface for current price information
+- `CandlestickDataPoint`: Interface for candlestick chart data
+- `TimeInterval`: Type for time interval options
+
+## Features
+
+- Real-time market data via WebSocket
+- Interactive candlestick charts
+- Multiple time intervals
+- Symbol switching (ETH/USDT, BTC/USDT, BNB/USDT)
+- Live price updates with visual indicators
+- Connection status monitoring
+- Responsive design
+
+## Usage
+
+The application is structured with a clean separation of concerns:
+
+1. **App.tsx**: Entry point that renders the main trading page
+2. **TradingPage.tsx**: Main page component that orchestrates all features
+3. **Components**: Reusable UI components for different parts of the interface
+4. **Hooks**: Custom hooks for data management and WebSocket handling
+5. **Types**: TypeScript definitions for type safety
+6. **Utils**: Helper functions for formatting and data manipulation
