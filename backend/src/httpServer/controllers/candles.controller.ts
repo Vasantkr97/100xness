@@ -1,5 +1,6 @@
 import { pool } from "../../db/schema";
 
+
 interface Candle {
     time: Date;      //bucket
     symbol: string;
