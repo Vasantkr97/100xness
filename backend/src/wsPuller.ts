@@ -3,17 +3,6 @@ import { WebSocket } from "ws";
 import { createClient } from "redis";
 import { tradeQueue } from "./uploader/queue";
 
-//call schema.ts once app getting started
-// const schema_ts = async () => {
-//    try {
-//       await schema();
-//    } catch (err) {
-//       console.log("failed to inilialize schema", err);
-//    }
-// }
-// schema_ts()
-
-
  const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@trade/ethusdt@trade
 `);
 

@@ -1,45 +1,53 @@
-import { Pool } from "pg";
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-export const pool = new Pool({ 
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.pool = void 0;
+exports.schema = schema;
+const pg_1 = require("pg");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+exports.pool = new pg_1.Pool({
     connectionString: process.env.DATABASE_URL,
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000,
 });
-
-
-
 // Enhanced pool error handling
-pool.on('connect', () => {
+exports.pool.on('connect', () => {
     console.log('New client connected to database');
 });
-
-pool.on('error', (err) => {
+exports.pool.on('error', (err) => {
     console.error('Database pool error:', err);
 });
-
 console.log("Database connection module loaded");
-
 // Test the connection on module load
-(async () => {
+(() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("running schema migration..")
-        await schema();
-        console.log("migration finished!")
-    } catch (err) {
+        console.log("running schema migration..");
+        yield schema();
+        console.log("migration finished!");
+    }
+    catch (err) {
         //console.error("migration:", err)
     }
-})();
-
-export async function schema() {
-    const client = await pool.connect();
-
-    try {
-       await client.query('BEGIN');
-        await client.query(`
+}))();
+function schema() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const client = yield exports.pool.connect();
+        try {
+            yield client.query('BEGIN');
+            yield client.query(`
             CREATE EXTENSION IF NOT EXISTS timescaledb;
 
             CREATE TABLE IF NOT EXISTS md_trades (
@@ -60,10 +68,8 @@ export async function schema() {
 
             CREATE INDEX IF NOT EXISTS idx_md_trades_symbol_ts ON md_trades(symbol, ts DESC);
 
-            `)
-
-        
-        await client.query(`
+            `);
+            yield client.query(`
             --DO IT FOR 1min
 
             CREATE MATERIALIZED VIEW IF NOT EXISTS md_candles_1m 
@@ -176,9 +182,8 @@ export async function schema() {
             CREATE INDEX IF NOT EXISTS idx_md_candles_1d_symbol_bucket
                 ON md_candles_1d(symbol, bucket DESC);
         `);
-
-        // checking refresh policy for each
-        await client.query(`
+            // checking refresh policy for each
+            yield client.query(`
             -- 1-minute refresh policy for md_candles_1m
             DO $$
             BEGIN
@@ -279,12 +284,14 @@ export async function schema() {
                 END IF;
             END$$;
         `);
-
-        await client.query('COMMIT');
-    } catch (err) {
-        await client.query('ROLLBACK');
-        throw err;
-    } finally {
-        client.release();
-    }
+            yield client.query('COMMIT');
+        }
+        catch (err) {
+            yield client.query('ROLLBACK');
+            throw err;
+        }
+        finally {
+            client.release();
+        }
+    });
 }

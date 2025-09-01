@@ -10,8 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
-const queue_1 = require("./queue");
 const redis_1 = require("redis");
+const queue_1 = require("./uploader/queue");
+//call schema.ts once app getting started
+// const schema_ts = async () => {
+//    try {
+//       await schema();
+//    } catch (err) {
+//       console.log("failed to inilialize schema", err);
+//    }
+// }
+// schema_ts()
 const ws = new ws_1.WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@trade/ethusdt@trade
 `);
 let publisher;
@@ -27,6 +36,5 @@ ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
     //Adding trade to redis queue
     yield queue_1.tradeQueue.add("trade-queue", data);
     //Publish trade data to redis pub/sub channel(tradeData)
-    // await publisher.publish("tradeData", stringify(data))
-    console.log("trade Data Published", data);
+    yield publisher.publish("tradeData", JSON.stringify(data));
 }));

@@ -17,9 +17,25 @@ app.use(cors({
 
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.send("Exness")
+});
+
 app.use("/api/candles", candlesRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/orders/", orderRoutes)
+app.use("/api/orders", orderRoutes)
+console.log("Orders routes registered");
+
+// app.use('*', (req, res) => {
+//     console.log(`Unmarched route: ${req.method} ${req.originalUrl}`);
+//     res.status(404).json({
+//         error: 'Route not Found',
+//         method: req.method,
+//         url: req.originalUrl
+//     })
+// })
+
+
 
 app.listen(PORT, () => {
     console.log(`http server is running on port ${PORT}`)
