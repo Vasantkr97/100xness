@@ -3,9 +3,9 @@ import { tradeWorker } from "./uploader/worker";
 console.log("🚀 Starting trade worker...");
 
 // Enable error handling
-tradeWorker.on("completed", (job) => {
-    console.log(`✅ Job ${job.id} completed successfully`);
-});
+// tradeWorker.on("completed", (job) => {
+//     console.log(`✅ Job ${job.id} completed successfully`);
+// });
 
 tradeWorker.on("failed", (job, err) => {
     console.error(`❌ Job ${job?.id} failed:`, err);

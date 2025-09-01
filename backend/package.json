@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start:ws": "ts-node src/wsPuller.ts",
-    "start:worker": "ts-node src/startWorker.ts",
+    "start:puller": "ts-node src/wsPuller.ts",
+    "start:uploader": "ts-node src/startWorker.ts",
     "migrate:schema": "ts-node src/db/schema.ts",
     "refresh:candles": "ts-node src/db/refreshCandles.ts",
     "httpServer": "nodemon src/httpServer/index.ts",
     "start:subscriber": "ts-node src/wsFE/wsSubscriber.ts",
-    "dev": "concurrently \"npm run start:ws\" \"npm run start:worker\" \"npm run httpServer\""
+    "dev": "concurrently \"npm run start:puller\" \"npm run start:worker\" \"npm run httpServer\""
   },
   "author": "",
   "license": "ISC",

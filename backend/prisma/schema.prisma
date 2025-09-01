@@ -26,7 +26,6 @@ model User {
 
   //relations
   orders                      Order[]
-  positions                   Position[]
 }
 
 model Order {
@@ -37,32 +36,16 @@ model Order {
   //Order details
   side                  OrderSide
   quantity              Decimal         @db.Decimal(15,8)
-  price                 Decimal         @db.Decimal(15,8)
+  entryPrice            Decimal         @db.Decimal(15,8)
   leverage              Int             @default(1)  
+  marginUsed              Decimal           @db.Decimal(15,8)
+
   //status
   status               OrderStatus      @default(PENDING)
   createdAt            DateTime         @default(now())
 
   //relations
   user                 User             @relation(fields: [userId],    references: [id], onDelete: Cascade)
-}
-
-model Position {
-  id                  String            @id   @default(cuid())
-  userId              String
-  symbol            String
-
-  side                PositionSide
-  quantity            Decimal           @db.Decimal(15,8)
-  leverage            Int               
-  entryPrice          Decimal           @db.Decimal(15,8)
-  currentPrice        Decimal           @db.Decimal(15,8)
-  margin              Decimal           @db.Decimal(15,8)
-  pnl                 Decimal           @default(0)  @db.Decimal(15,8)
-  isOpen              Boolean           @default(true)
-  createdAt           DateTime          @default(now())    
-
-  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 
@@ -78,10 +61,7 @@ enum OrderStatus {
   REJECTED
 }
 
-enum PositionSide {
-  LONG
-  SHORT
-}
+
 
 
 

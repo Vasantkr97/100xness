@@ -56,8 +56,9 @@ export async function placeOrder(req: Request, res: Response): Promise<void> {
                 symbol,
                 side,
                 quantity: new Prisma.Decimal(quantity),
-                price: new Prisma.Decimal(curPrice),
+                entryPrice: new Prisma.Decimal(curPrice),
                 leverage,
+                marginUsed,
                 status: "FILLED"
             },
             include: {
@@ -90,7 +91,8 @@ export async function placeOrder(req: Request, res: Response): Promise<void> {
             }
         })
     } catch(err) {
-        console.error("Error placing Order:",err);
+        const error = err as Error;
+        console.error("Error placing Order:", error.message);
         res.status(500).json({
             success: false,
             msg: "Interval Server Error while placing order",
@@ -101,17 +103,19 @@ export async function placeOrder(req: Request, res: Response): Promise<void> {
 
 export async function userOrders(req: Request, res: Response): Promise<void> {
     try {
-        const { userId } = req.body;
+        const { userId } = req.body as { userId?: string };
 
-        if (!userId) {
+        if (!userId || typeof userId !== "string") {
             res.status(400).json({
                 success: false,
-                message: "userId is required"
+                message: "valid userId is required"
             });
         };
 
         const orders = await prisma.order.findMany({
-            where: { userId },
+            where: { userId,
+                status: "FILLED"
+             },
             orderBy: {
                 createdAt: "desc"
             }
@@ -131,17 +135,58 @@ export async function userOrders(req: Request, res: Response): Promise<void> {
     }
 };
 
-export async function orderDetails(req: Request, res: Response ): Promise<void> {
-    
-};
-
-export async function orderStatus(): Promise<void> {
-
-};
 
 export async function cancelOrder(req: Request, res: Response): Promise<void> {
+    try {
+        const { orderId } = req.body as { orderId?: string};
+        const { userId } = req.body as { userId?: string};
+
+        if (!orderId) {
+            res.status(400).json({
+                success: false,
+                message: "OrderId is required",
+            })
+        }
+
+        const existingOrder = await prisma.order.findFirst({
+            where: {
+                id: orderId,
+                userId,
+            }
+        });
+
+        if (!existingOrder) {
+            res.status(404).json({
+                success: false,
+                message: "Order not found or cannot be cancelled"
+            });
+            return
+        }
+
+        const result = await prisma.order.updateMany({
+            where: {
+                id: orderId,
+                userId,
+                status: { not: "CANCELLED"}
+            },
+            data: {
+                status: "CANCELLED"
+            },
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Order cancelled successfully",
+            data: result
+        })
+    } catch (err: unknown) {
+        const error = err as Error;
+        console.error('Error cancelling order:', error);
+        res.status(500).json({
+            success: false,
+            message: "internal server error",
+            error: error.message
+        })
+    }
 };
 
-export async function getPositions(): Promise<void> {
-
-};
